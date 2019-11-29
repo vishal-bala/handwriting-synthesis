@@ -15,6 +15,7 @@ setup(
     author_email='seanjv@mit.edu',
     maintainer='Vishal Bala',
     maintainer_email='vishal@vishalbala.com',
+    python_requires='>=3.0, <4.0',
     install_requires=[str(req.req) for req in parse_requirements(
         'requirements.txt', session=PipSession(),
     )],
