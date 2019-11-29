@@ -18,7 +18,7 @@ pyparsing==2.4.5                    # via svgwrite, matplotlib
 python-dateutil==2.8.1              # via pandas, matplotlib
 pytz==2019.3                        # via pandas
 scikit-learn==0.21.3
-scipy==1.3.3                        # via scikit-learn
+scipy==1.3.3
 six==1.13.0                         # via tensorflow, tensorflow-estimator, tensorboard, python-dateutil, protobuf, mock, Keras-Preprocessing, h5py, grpcio, cycler, absl-py
 svgwrite==1.3.1
 tensorboard==1.13.1                 # via tensorflow
