@@ -1,6 +1,6 @@
 import numpy as np
 
-from handwriting_synthesis import lyrics
+import lyrics
 from handwriting_synthesis.hand import Hand
 
 

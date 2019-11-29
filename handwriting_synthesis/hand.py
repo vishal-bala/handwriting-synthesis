@@ -8,6 +8,8 @@ from handwriting_synthesis import drawing
 from handwriting_synthesis.rnn import rnn
 
 
+PATH = os.path.dirname(os.path.abspath(__file__))
+
 class Hand(object):
 
     def __init__(self):
@@ -43,7 +45,7 @@ class Hand(object):
             if len(line) > 75:
                 raise ValueError(
                     (
-                        "Each line must be at most 75 characters. "
+                        "Each line must be at most 75 characters. " 
                         "Line {} contains {}"
                     ).format(line_num, len(line))
                 )
@@ -72,8 +74,8 @@ class Hand(object):
 
         if styles is not None:
             for i, (cs, style) in enumerate(zip(lines, styles)):
-                x_p = np.load('styles/style-{}-strokes.npy'.format(style))
-                c_p = np.load('styles/style-{}-chars.npy'.format(style)).tostring().decode('utf-8')
+                x_p = np.load(os.path.join(PATH, 'styles/style-{}-strokes.npy'.format(style)))
+                c_p = np.load(os.path.join(PATH, 'styles/style-{}-chars.npy'.format(style))).tostring().decode('utf-8')
 
                 c_p = str(c_p) + " " + cs
                 c_p = drawing.encode_ascii(c_p)

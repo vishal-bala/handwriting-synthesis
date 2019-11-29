@@ -1,10 +1,10 @@
 from collections import namedtuple
 
-import tensorflow as tf
-import tensorflow.contrib.distributions as tfd
 import numpy as np
+import tensorflow as tf
+from tensorflow_probability import distributions as tfd
 
-from tf_utils import dense_layer, shape
+from handwriting_synthesis.tf_utils import dense_layer, shape
 
 
 LSTMAttentionCellState = namedtuple(
@@ -24,7 +24,9 @@ class LSTMAttentionCell(tf.nn.rnn_cell.RNNCell):
         num_output_mixture_components,
         bias,
         reuse=None,
+        **kwargs
     ):
+        super(LSTMAttentionCell, self).__init__(**kwargs)
         self.reuse = reuse
         self.lstm_size = lstm_size
         self.num_attn_mixture_components = num_attn_mixture_components

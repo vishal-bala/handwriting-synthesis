@@ -3,7 +3,7 @@ from xml.etree import ElementTree
 
 import numpy as np
 
-import drawing
+from handwriting_synthesis import drawing
 
 
 def get_stroke_sequence(filename):
