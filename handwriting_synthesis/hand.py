@@ -1,14 +1,13 @@
 import os
 import logging
 
+import cairosvg
 import numpy as np
 import svgwrite
 
-from handwriting_synthesis import drawing
+from handwriting_synthesis import BASE_PATH, drawing
 from handwriting_synthesis.rnn import rnn
 
-
-PATH = os.path.dirname(os.path.abspath(__file__))
 
 class Hand(object):
 
@@ -16,8 +15,8 @@ class Hand(object):
         os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
         self.nn = rnn(
             log_dir='logs',
-            checkpoint_dir='checkpoints',
-            prediction_dir='predictions',
+            checkpoint_dir=os.path.join(BASE_PATH, '../checkpoints'),
+            prediction_dir=os.path.join(BASE_PATH, '../predictions'),
             learning_rates=[.0001, .00005, .00002],
             batch_sizes=[32, 64, 64],
             patiences=[1500, 1000, 500],
@@ -45,7 +44,7 @@ class Hand(object):
             if len(line) > 75:
                 raise ValueError(
                     (
-                        "Each line must be at most 75 characters. " 
+                        "Each line must be at most 75 characters. "
                         "Line {} contains {}"
                     ).format(line_num, len(line))
                 )
@@ -74,8 +73,8 @@ class Hand(object):
 
         if styles is not None:
             for i, (cs, style) in enumerate(zip(lines, styles)):
-                x_p = np.load(os.path.join(PATH, 'styles/style-{}-strokes.npy'.format(style)))
-                c_p = np.load(os.path.join(PATH, 'styles/style-{}-chars.npy'.format(style))).tostring().decode('utf-8')
+                x_p = np.load(os.path.join(BASE_PATH, 'styles/style-{}-strokes.npy'.format(style)))
+                c_p = np.load(os.path.join(BASE_PATH, 'styles/style-{}-chars.npy'.format(style))).tostring().decode('utf-8')
 
                 c_p = str(c_p) + " " + cs
                 c_p = drawing.encode_ascii(c_p)
@@ -109,18 +108,21 @@ class Hand(object):
         return samples
 
     def _draw(self, strokes, lines, filename, stroke_colors=None, stroke_widths=None):
+
+        if not filename.endswith(('.png', '.svg')):
+            raise ValueError(f"'.{filename.split('.')[-1]}' image format not supported")
+
         stroke_colors = stroke_colors or ['black']*len(lines)
         stroke_widths = stroke_widths or [2]*len(lines)
 
         line_height = 60
-        view_width = 1000
-        view_height = line_height*(len(strokes) + 1)
+        view_width, view_height = 1000, line_height*(len(strokes) + 1)
 
         dwg = svgwrite.Drawing(filename=filename)
         dwg.viewbox(width=view_width, height=view_height)
         dwg.add(dwg.rect(insert=(0, 0), size=(view_width, view_height), fill='white'))
 
-        initial_coord = np.array([0, -(3*line_height / 4)])
+        initial_coord = np.array([0, -(3 * line_height / 4)])
         for offsets, line, color, width in zip(strokes, lines, stroke_colors, stroke_widths):
 
             if not line:
@@ -147,4 +149,7 @@ class Hand(object):
 
             initial_coord[1] -= line_height
 
-        dwg.save()
+        if filename.endswith('.png'):
+            cairosvg.svg2png(bytestring=dwg.tostring(), write_to=filename, dpi=600)
+        else:
+            dwg.save()
