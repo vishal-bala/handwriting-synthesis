@@ -2,8 +2,28 @@
 # Handwriting Synthesis
 Implementation of the handwriting synthesis experiments in the paper <a href="https://arxiv.org/abs/1308.0850">Generating Sequences with Recurrent Neural Networks</a> by Alex Graves.  The implementation closely follows the original paper, with a few slight deviations, and the generated samples are of similar quality to those presented in the paper.
 
+## Installation
+
+The project can be installed into the current Python environment with
+```bash
+pip install .
+```
+
+#### PNG Image Export
+
+For generated images to be exported as PNG files, a few additional steps are required via the CairoSVG dependency. On OS X, the `cairo` and `libffi` system packages must be installed (via `brew`), and the following lines should be added to the `.bash_profile` ([source](https://github.com/Kozea/WeasyPrint/issues/737#issuecomment-439112117)): 
+
+```bash
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8 
+```
+
+Note that these steps have only been tested in an OS X environment, and may differ on other platforms.
+
 ## Usage
 ```python
+from handwriting_synthesis.hand import Hand
+
 lines = [
     "Now this is a story all about how",
     "My life got flipped turned upside down",
@@ -26,8 +46,6 @@ hand.write(
 )
 ```
 ![](img/usage_demo.svg)
-
-Currently, the `Hand` class must be imported from `demo.py`.  If someone would like to package this project to make it more usable, please [contribute](#contribute).
 
 A pretrained model is included, but if you'd like to train your own, read <a href='https://github.com/sjvasquez/handwriting-synthesis/tree/master/data/raw'>these instructions</a>.
 
@@ -53,7 +71,8 @@ The following samples were generated with a fixed style and varying bias.  Each 
 ![](img/give_up.svg)
 
 ## Contribute
-This project was intended to serve as a reference implementation for a research paper, but since the results are of decent quality, it may be worthwile to make the project more broadly usable.  I plan to continue focusing on the machine learning side of things.  That said, I'd welcome contributors who can:
-
-  - Package this, and otherwise make it look more like a usable software project and less like research code.
-  - Add support for more sophisticated drawing, animations, or anything else in this direction.  Currently, the project only creates some simple svg files.
+Areas for future contributions:
+- General project documentation and commenting
+- Structural cleanup and optimization
+- Updates to newer TensorFlow versions and deprecation updates
+- Completely packaging this project for PyPi
