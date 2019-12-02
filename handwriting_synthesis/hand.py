@@ -1,14 +1,13 @@
 import os
 import logging
 
+import cairosvg
 import numpy as np
 import svgwrite
 
 from handwriting_synthesis import BASE_PATH, drawing
 from handwriting_synthesis.rnn import rnn
 
-
-PATH = os.path.dirname(os.path.abspath(__file__))
 
 class Hand(object):
 
@@ -74,8 +73,8 @@ class Hand(object):
 
         if styles is not None:
             for i, (cs, style) in enumerate(zip(lines, styles)):
-                x_p = np.load(os.path.join(PATH, 'styles/style-{}-strokes.npy'.format(style)))
-                c_p = np.load(os.path.join(PATH, 'styles/style-{}-chars.npy'.format(style))).tostring().decode('utf-8')
+                x_p = np.load(os.path.join(BASE_PATH, 'styles/style-{}-strokes.npy'.format(style)))
+                c_p = np.load(os.path.join(BASE_PATH, 'styles/style-{}-chars.npy'.format(style))).tostring().decode('utf-8')
 
                 c_p = str(c_p) + " " + cs
                 c_p = drawing.encode_ascii(c_p)
@@ -109,6 +108,16 @@ class Hand(object):
         return samples
 
     def _draw(self, strokes, lines, filename, stroke_colors=None, stroke_widths=None):
+
+        png_save = False
+        if filename.endswith('png'):
+            png_save = True
+            svg_filename = '/tmp/hw0.svg'
+        elif filename.endswith('.svg'):
+            svg_filename = filename
+        else:
+            raise ValueError(f"'.{filename.split('.')[-1]}' image format not supported")
+
         stroke_colors = stroke_colors or ['black']*len(lines)
         stroke_widths = stroke_widths or [2]*len(lines)
 
@@ -116,7 +125,7 @@ class Hand(object):
         view_width = 1000
         view_height = line_height*(len(strokes) + 1)
 
-        dwg = svgwrite.Drawing(filename=filename)
+        dwg = svgwrite.Drawing(filename=svg_filename)
         dwg.viewbox(width=view_width, height=view_height)
         dwg.add(dwg.rect(insert=(0, 0), size=(view_width, view_height), fill='white'))
 
@@ -148,3 +157,7 @@ class Hand(object):
             initial_coord[1] -= line_height
 
         dwg.save()
+
+        if png_save:
+            with open(svg_filename, 'rb') as f:
+                cairosvg.svg2png(file_obj=f, write_to=filename, dpi=600)
