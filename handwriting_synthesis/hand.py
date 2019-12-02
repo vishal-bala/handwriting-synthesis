@@ -109,13 +109,7 @@ class Hand(object):
 
     def _draw(self, strokes, lines, filename, stroke_colors=None, stroke_widths=None):
 
-        png_save = False
-        if filename.endswith('png'):
-            png_save = True
-            svg_filename = '/tmp/hw0.svg'
-        elif filename.endswith('.svg'):
-            svg_filename = filename
-        else:
+        if not filename.endswith(('.png', '.svg')):
             raise ValueError(f"'.{filename.split('.')[-1]}' image format not supported")
 
         stroke_colors = stroke_colors or ['black']*len(lines)
@@ -125,7 +119,7 @@ class Hand(object):
         view_width = 1000
         view_height = line_height*(len(strokes) + 1)
 
-        dwg = svgwrite.Drawing(filename=svg_filename)
+        dwg = svgwrite.Drawing(filename=filename)
         dwg.viewbox(width=view_width, height=view_height)
         dwg.add(dwg.rect(insert=(0, 0), size=(view_width, view_height), fill='white'))
 
@@ -156,8 +150,7 @@ class Hand(object):
 
             initial_coord[1] -= line_height
 
-        dwg.save()
-
-        if png_save:
-            with open(svg_filename, 'rb') as f:
-                cairosvg.svg2png(file_obj=f, write_to=filename, dpi=600)
+        if filename.endswith('.png'):
+            cairosvg.svg2png(bytestring=dwg.tostring(), write_to=filename, dpi=600)
+        else:
+            dwg.save()
