@@ -116,14 +116,13 @@ class Hand(object):
         stroke_widths = stroke_widths or [2]*len(lines)
 
         line_height = 60
-        view_width = 1000
-        view_height = line_height*(len(strokes) + 1)
+        view_width, view_height = 1000, line_height*(len(strokes) + 1)
 
         dwg = svgwrite.Drawing(filename=filename)
         dwg.viewbox(width=view_width, height=view_height)
         dwg.add(dwg.rect(insert=(0, 0), size=(view_width, view_height), fill='white'))
 
-        initial_coord = np.array([0, -(3*line_height / 4)])
+        initial_coord = np.array([0, -(3 * line_height / 4)])
         for offsets, line, color, width in zip(strokes, lines, stroke_colors, stroke_widths):
 
             if not line:
