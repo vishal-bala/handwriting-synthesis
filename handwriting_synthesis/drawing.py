@@ -1,6 +1,5 @@
 from collections import defaultdict
 
-import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import savgol_filter
 from scipy.interpolate import interp1d
@@ -151,65 +150,3 @@ def offsets_to_coords(offsets):
     convert from offsets to coordinates
     """
     return np.concatenate([np.cumsum(offsets[:, :2], axis=0), offsets[:, 2:3]], axis=1)
-
-
-def draw(
-        offsets,
-        ascii_seq=None,
-        align_strokes=True,
-        denoise_strokes=True,
-        interpolation_factor=None,
-        save_file=None
-):
-    strokes = offsets_to_coords(offsets)
-
-    if denoise_strokes:
-        strokes = denoise(strokes)
-
-    if interpolation_factor is not None:
-        strokes = interpolate(strokes, factor=interpolation_factor)
-
-    if align_strokes:
-        strokes[:, :2] = align(strokes[:, :2])
-
-    fig, ax = plt.subplots(figsize=(12, 3))
-
-    stroke = []
-    for x, y, eos in strokes:
-        stroke.append((x, y))
-        if eos == 1:
-            coords = zip(*stroke)
-            ax.plot(coords[0], coords[1], 'k')
-            stroke = []
-    if stroke:
-        coords = zip(*stroke)
-        ax.plot(coords[0], coords[1], 'k')
-        stroke = []
-
-    ax.set_xlim(-50, 600)
-    ax.set_ylim(-40, 40)
-
-    ax.set_aspect('equal')
-    plt.tick_params(
-        axis='both',
-        left='off',
-        top='off',
-        right='off',
-        bottom='off',
-        labelleft='off',
-        labeltop='off',
-        labelright='off',
-        labelbottom='off'
-    )
-
-    if ascii_seq is not None:
-        if not isinstance(ascii_seq, str):
-            ascii_seq = ''.join(list(map(chr, ascii_seq)))
-        plt.title(ascii_seq)
-
-    if save_file is not None:
-        plt.savefig(save_file)
-        print('saved to {}'.format(save_file))
-    else:
-        plt.show()
-    plt.close('all')
