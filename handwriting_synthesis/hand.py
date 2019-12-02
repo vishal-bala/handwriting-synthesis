@@ -4,7 +4,7 @@ import logging
 import numpy as np
 import svgwrite
 
-from handwriting_synthesis import drawing
+from handwriting_synthesis import BASE_PATH, drawing
 from handwriting_synthesis.rnn import rnn
 
 
@@ -16,8 +16,8 @@ class Hand(object):
         os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
         self.nn = rnn(
             log_dir='logs',
-            checkpoint_dir='checkpoints',
-            prediction_dir='predictions',
+            checkpoint_dir=os.path.join(BASE_PATH, '../checkpoints'),
+            prediction_dir=os.path.join(BASE_PATH, '../predictions'),
             learning_rates=[.0001, .00005, .00002],
             batch_sizes=[32, 64, 64],
             patiences=[1500, 1000, 500],
@@ -45,7 +45,7 @@ class Hand(object):
             if len(line) > 75:
                 raise ValueError(
                     (
-                        "Each line must be at most 75 characters. " 
+                        "Each line must be at most 75 characters. "
                         "Line {} contains {}"
                     ).format(line_num, len(line))
                 )

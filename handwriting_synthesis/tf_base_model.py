@@ -8,6 +8,7 @@ import time
 import numpy as np
 import tensorflow as tf
 
+from handwriting_synthesis import BASE_PATH
 from handwriting_synthesis.tf_utils import shape
 
 
@@ -68,8 +69,8 @@ class TFBaseModel(object):
         loss_averaging_window=100,
         validation_batch_size=64,
         log_dir='logs',
-        checkpoint_dir='checkpoints',
-        prediction_dir='predictions',
+        checkpoint_dir=os.path.join(BASE_PATH, '../checkpoints'),
+        prediction_dir=os.path.join(BASE_PATH, '../predictions'),
     ):
 
         assert len(batch_sizes) == len(learning_rates) == len(patiences)
