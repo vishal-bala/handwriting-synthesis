@@ -1,11 +1,14 @@
+import os
+
 import numpy as np
 
 import lyrics
+from handwriting_synthesis import BASE_DIR
 from handwriting_synthesis.hand import Hand
 
 
 if __name__ == '__main__':
-    hand = Hand()
+    hand = Hand(os.path.join(BASE_DIR, '../checkpoints'), os.path.join(BASE_DIR, '../predictions'))
 
     # usage demo
     lines = [
