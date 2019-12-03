@@ -11,12 +11,12 @@ from handwriting_synthesis.rnn import rnn
 
 class Hand(object):
 
-    def __init__(self):
+    def __init__(self, checkpoint_dir, prediction_dir):
         os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
         self.nn = rnn(
             log_dir='logs',
-            checkpoint_dir=os.path.join(BASE_PATH, '../checkpoints'),
-            prediction_dir=os.path.join(BASE_PATH, '../predictions'),
+            checkpoint_dir=checkpoint_dir,
+            prediction_dir=prediction_dir,
             learning_rates=[.0001, .00005, .00002],
             batch_sizes=[32, 64, 64],
             patiences=[1500, 1000, 500],
