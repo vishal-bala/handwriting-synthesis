@@ -9,18 +9,20 @@ except ImportError:  # For pip <= 9.0.3
 
 setup(
     name='handwriting-synthesis',
-    version='0.1.0',
+    version='0.1.3',
     packages=find_packages(),
-    author='Sean Vasquez',
-    author_email='seanjv@mit.edu',
-    maintainer='Vishal Bala',
-    maintainer_email='vishal@vishalbala.com',
     python_requires='>=3.0, <4.0',
     package_data={
         '': ['*.npy'],
     },
     include_package_data=True,
-    install_requires=[str(req.req) for req in parse_requirements(
-        'requirements.txt', session=PipSession(),
-    )],
+    install_requires=[
+        'CairoSVG',
+        'pandas',
+        'scikit-learn',
+        'scipy',
+        'svgwrite',
+        'tensorflow==1.13.1',
+        'tensorflow-probability==0.6.0',
+    ],
 )
