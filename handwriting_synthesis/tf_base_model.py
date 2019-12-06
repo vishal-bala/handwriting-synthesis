@@ -265,7 +265,7 @@ class TFBaseModel(object):
 
     def predict(self, chunk_size=256):
         if not os.path.isdir(self.prediction_dir):
-            os.makedirs(self.prediction_dir)
+            os.makedirs(self.prediction_dir, exist_ok=True)
 
         if hasattr(self, 'prediction_tensors'):
             prediction_dict = {tensor_name: [] for tensor_name in self.prediction_tensors}
@@ -333,7 +333,7 @@ class TFBaseModel(object):
 
     def init_logging(self, log_dir):
         if not os.path.isdir(log_dir):
-            os.makedirs(log_dir)
+            os.makedirs(log_dir, exist_ok=True)
 
         date_str = datetime.now().strftime('%Y-%m-%d_%H-%M')
         log_file = 'log_{}.txt'.format(date_str)

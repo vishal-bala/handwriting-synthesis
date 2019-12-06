@@ -124,7 +124,7 @@ if __name__ == '__main__':
         w_id[i] = w_id_i
 
     if not os.path.isdir('data/processed'):
-        os.makedirs('data/processed')
+        os.makedirs('data/processed', exist_ok=True)
 
     np.save('data/processed/x.npy', x[valid_mask])
     np.save('data/processed/x_len.npy', x_len[valid_mask])
