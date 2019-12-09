@@ -1,9 +1,12 @@
 import os
 import logging
+from io import BytesIO
 
-import cairosvg
 import numpy as np
+import PIL
 import svgwrite
+from cairosvg.parser import Tree
+from cairosvg.surface import PNGSurface
 
 from handwriting_synthesis import BASE_PATH, drawing
 from handwriting_synthesis.rnn import rnn
@@ -38,7 +41,7 @@ class Hand(object):
         )
         self.nn.restore()
 
-    def write(self, filename, lines, biases=None, styles=None, stroke_colors=None, stroke_widths=None):
+    def write(self, lines, biases=None, styles=None, stroke_colors=None, stroke_widths=None):
         valid_char_set = set(drawing.alphabet)
         for line_num, line in enumerate(lines):
             if len(line) > 75:
@@ -59,7 +62,7 @@ class Hand(object):
                     )
 
         strokes = self._sample(lines, biases=biases, styles=styles)
-        self._draw(strokes, lines, filename, stroke_colors=stroke_colors, stroke_widths=stroke_widths)
+        return self._draw(strokes, lines, stroke_colors=stroke_colors, stroke_widths=stroke_widths)
 
     def _sample(self, lines, biases=None, styles=None):
         num_samples = len(lines)
@@ -107,10 +110,7 @@ class Hand(object):
         samples = [sample[~np.all(sample == 0.0, axis=1)] for sample in samples]
         return samples
 
-    def _draw(self, strokes, lines, filename, stroke_colors=None, stroke_widths=None):
-
-        if not filename.endswith(('.png', '.svg')):
-            raise ValueError(f"'.{filename.split('.')[-1]}' image format not supported")
+    def _draw(self, strokes, lines, stroke_colors=None, stroke_widths=None):
 
         stroke_colors = stroke_colors or ['black']*len(lines)
         stroke_widths = stroke_widths or [2]*len(lines)
@@ -118,7 +118,7 @@ class Hand(object):
         line_height = 60
         view_width, view_height = 1000, line_height*(len(strokes) + 1)
 
-        dwg = svgwrite.Drawing(filename=filename)
+        dwg = svgwrite.Drawing()
         dwg.viewbox(width=view_width, height=view_height)
         dwg.add(dwg.rect(insert=(0, 0), size=(view_width, view_height), fill='white'))
 
@@ -149,7 +149,10 @@ class Hand(object):
 
             initial_coord[1] -= line_height
 
-        if filename.endswith('.png'):
-            cairosvg.svg2png(bytestring=dwg.tostring(), write_to=filename, dpi=600)
-        else:
-            dwg.save()
+        surface = PNGSurface(
+            tree=Tree(bytestring=dwg.tostring(), unsafe=False),
+            output=BytesIO(),
+            dpi=600
+        )
+        surface.finish()
+        return PIL.Image.open(surface.output)
