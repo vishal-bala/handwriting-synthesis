@@ -9,7 +9,7 @@ except ImportError:  # For pip <= 9.0.3
 
 setup(
     name='handwriting-synthesis',
-    version='0.1.4',
+    version='0.1.5',
     packages=find_packages(),
     python_requires='>=3.0, <4.0',
     package_data={
