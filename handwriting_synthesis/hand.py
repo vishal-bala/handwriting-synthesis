@@ -41,8 +41,12 @@ class Hand(object):
         )
         self.nn.restore()
 
-    def write(self, lines, biases=None, styles=None, stroke_colors=None, stroke_widths=None):
+    def write(self, lines, biases=None, styles=None, stroke_colors=None, stroke_widths=None, scales=None, xscales=None, yscales=None):
         valid_char_set = set(drawing.alphabet)
+
+        if scales is not None and (xscales is not None or yscales is not None):
+            raise ValueError('Cannot provide a flat scaling value in addition to individual axis scaling.')
+
         for line_num, line in enumerate(lines):
             if len(line) > 75:
                 raise ValueError(
@@ -62,7 +66,7 @@ class Hand(object):
                     )
 
         strokes = self._sample(lines, biases=biases, styles=styles)
-        return self._draw(strokes, lines, stroke_colors=stroke_colors, stroke_widths=stroke_widths)
+        return self._draw(strokes, lines, stroke_colors=stroke_colors, stroke_widths=stroke_widths, scales=scales, xscales=xscales, yscales=yscales)
 
     def _sample(self, lines, biases=None, styles=None):
         num_samples = len(lines)
@@ -110,26 +114,32 @@ class Hand(object):
         samples = [sample[~np.all(sample == 0.0, axis=1)] for sample in samples]
         return samples
 
-    def _draw(self, strokes, lines, stroke_colors=None, stroke_widths=None):
+    def _draw(self, strokes, lines, stroke_colors=None, stroke_widths=None, scales=None, xscales=None, yscales=None):
 
         stroke_colors = stroke_colors or ['black']*len(lines)
         stroke_widths = stroke_widths or [2]*len(lines)
+        scales = scales or [1.0]*len(lines)
+        xscales = xscales or [1.0]*len(lines)
+        yscales = yscales or [1.0]*len(lines)
+
+        max_xsc = max(xscales + scales)
+        max_ysc = max(yscales + scales)
 
         line_height = 60
         view_width, view_height = 1000, line_height*(len(lines) + 1)
 
         dwg = svgwrite.Drawing()
-        dwg.viewbox(width=view_width, height=view_height)
-        dwg.add(dwg.rect(insert=(0, 0), size=(view_width, view_height), fill='white'))
+        dwg.viewbox(width=view_width*max_xsc, height=view_height*max_ysc)
+        dwg.add(dwg.rect(insert=(0, 0), size=(view_width*max_xsc, view_height*max_ysc), fill='white'))
 
-        initial_coord = np.array([0, -(3 * line_height / 4)])
-        for offsets, line, color, width in zip(strokes, lines, stroke_colors, stroke_widths):
+        initial_coord = np.array([0.4*view_width, -0.5*line_height])
+        for offsets, line, color, width, scale, xsc, ysc in zip(strokes, lines, stroke_colors, stroke_widths, scales, xscales, yscales):
 
             if not line:
                 initial_coord[1] -= line_height
                 continue
 
-            offsets[:, :2] *= 1.5
+            offsets[:, :2] *= 1.5 * scale
             strokes = drawing.offsets_to_coords(offsets)
             strokes = drawing.denoise(strokes)
             strokes[:, :2] = drawing.align(strokes[:, :2])
@@ -141,6 +151,8 @@ class Hand(object):
             prev_eos = 1.0
             p = "M{},{} ".format(0, 0)
             for x, y, eos in zip(*strokes.T):
+                x *= xsc
+                y *= ysc
                 p += '{}{},{} '.format('M' if prev_eos == 1.0 else 'L', x, y)
                 prev_eos = eos
             path = svgwrite.path.Path(p)
