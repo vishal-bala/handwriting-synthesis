@@ -116,7 +116,7 @@ class Hand(object):
         stroke_widths = stroke_widths or [2]*len(lines)
 
         line_height = 60
-        view_width, view_height = 1000, line_height*(len(strokes) + 1)
+        view_width, view_height = 1000, line_height*(len(lines) + 1)
 
         dwg = svgwrite.Drawing()
         dwg.viewbox(width=view_width, height=view_height)
