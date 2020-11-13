@@ -16,7 +16,7 @@ setup(
         'scikit-learn',
         'scipy',
         'svgwrite',
-        'tensorflow==1.13.1',
+        'tensorflow==2.3.1',
         'tensorflow-probability==0.6.0',
     ],
 )
