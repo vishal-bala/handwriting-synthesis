@@ -1,7 +1,7 @@
 absl-py==0.8.1                       # via tensorflow, tensorflow-estimator, tensorboard
 astor==0.8.0                         # via tensorflow
 cairocffi==1.1.0                     # via CairoSVG
-CairoSVG==2.4.2
+CairoSVG==2.5.1
 cffi==1.13.2                         # via cairocffi
 cssselect2==0.2.2                    # via CairoSVG
 defusedxml==0.6.0                    # via CairoSVG
